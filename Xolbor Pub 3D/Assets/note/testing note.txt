@@ -1,4 +1,0 @@
-- to change the scene press number buttons (1, 2, 3, etc.) or press the UI button manually
-- press R to reload the scene
-
-**every scene switching and reloading will disable the connect automatically

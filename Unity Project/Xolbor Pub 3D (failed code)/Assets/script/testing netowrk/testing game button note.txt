@@ -1,0 +1,6 @@
+number + Z = go to that scene number
+1 - netcode intro
+2 - login, leave game and spawn player system
+
+Z + R = reload scene and shutdown server
+Z + S = shutdown server only

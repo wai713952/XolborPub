@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/scenes/scene1_netcode_intro.unity
+    path: Assets/Scenes/test scene/in-class online scene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/test scene/test no network scene.unity
+    guid: 48c8170d7214eab429208565e911751c
+  - enabled: 1
+    path: Assets/Scenes/test scene/test online scene.unity
+    guid: af9da99adfcf58349b69568fa8a94551
   m_configObjects: {}

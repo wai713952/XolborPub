@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System;
 
 public class PlayerControllerInteraction : NetworkBehaviour
 {
+    public bool canControlCharacterRay = true;
+
     private Ray interactionRay;
     private RaycastHit interactionHitObject;
     public LayerMask interactionMask;
@@ -14,11 +17,9 @@ public class PlayerControllerInteraction : NetworkBehaviour
     
     private MiniGameControllerLobby miniGameControllerLobby;
     private MainPlayer mainPlayer;
-    private LoginManager loginManager;
 
     public string playerName;
     public int playerId;
-    bool haveNameInList = false;
     
     public GameObject playerFPSCamera;
     bool isCameraActive = false;
@@ -26,7 +27,6 @@ public class PlayerControllerInteraction : NetworkBehaviour
     private void Start()
     {
         Invoke("NameAndIdGet", 1f);
-
         InvokeRepeating("PlayerCancleInteractionCheck", 0.5f, 1f);
     }
     private void NameAndIdGet()
@@ -34,14 +34,14 @@ public class PlayerControllerInteraction : NetworkBehaviour
         mainPlayer = GetComponent<MainPlayer>();
         playerName = mainPlayer.PlayerName.Value;
 
-        loginManager = FindObjectOfType<LoginManager>();
-        playerId = loginManager.playerCliendId;
+        playerId = Convert.ToInt32(NetworkManager.Singleton.LocalClientId);
     }
 
     private void Update()
     {
         if (IsClient && IsOwner)
         {
+            if(canControlCharacterRay == false) { return; }
             PlayerRayCast();
             PlayerFirstPersonView();
         }
@@ -104,11 +104,9 @@ public class PlayerControllerInteraction : NetworkBehaviour
                 if (interact.pressCount == 1 && 
                     (lobby.miniGameStatusNetwork.Value == "Players Full" || lobby.miniGameStatusNetwork.Value == "Waiting For Player(s)"))
                 {
-                    
                     interact.InteractedByPlayer(playerName, playerId, playerTransform);
                     miniGamePosition = interact.SendPlayerObjectPosition();
                     miniGameControllerLobby = lobby;
-                    haveNameInList = false;
                 }
             }
         }

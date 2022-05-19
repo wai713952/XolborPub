@@ -22,6 +22,8 @@ public class MainPlayer : NetworkBehaviour
 
     private LoginManager loginManager;
 
+    public bool canControlCharacterMovement = true;
+
     private void Start()
     {
         rigidbody = this.GetComponent<Rigidbody>();
@@ -78,7 +80,7 @@ public class MainPlayer : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (IsClient && IsOwner)
+        if (IsClient && IsOwner && canControlCharacterMovement == true)
         {
             float translation = Input.GetAxis("Vertical") * speed;
             translation *= Time.deltaTime;

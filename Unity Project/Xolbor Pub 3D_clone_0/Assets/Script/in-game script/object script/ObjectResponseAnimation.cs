@@ -11,6 +11,7 @@ public class ObjectResponseAnimation : NetworkBehaviour
     NetworkVariable<bool> canBeInteractWith = new NetworkVariable<bool>();
 
     Animator animator;
+    private float timeWaitForNextInteraction = 1f;
 
     private void Start()
     {
@@ -24,13 +25,19 @@ public class ObjectResponseAnimation : NetworkBehaviour
         if (canBeInteractWith.Value == true)
         {
             canBeInteractWith.Value = false;
-            animator.SetTrigger("play animation");
+            animator.SetBool("play animation", true);
         }
     }
 
     public void ResetInteractionAfterAnimation()
     {
         //this method will be called in animation frame
+
+        animator.SetBool("play animation", false);
+        Invoke("ResetWaiting", timeWaitForNextInteraction);
+    }
+    private void ResetWaiting()
+    {
         canBeInteractWith.Value = true;
     }
 }

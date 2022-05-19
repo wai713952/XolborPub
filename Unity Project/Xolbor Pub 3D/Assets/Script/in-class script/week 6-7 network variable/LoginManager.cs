@@ -12,16 +12,28 @@ public class LoginManager : MonoBehaviour
     public GameObject loginPanel;
     public GameObject leaveButton;
     public GameObject scorePanel;
-    [HideInInspector] public int playerCliendId;
+
+    ObjectJukebox objectJukebox;
 
     private void Start()    //subscribe the event
+    {
+        SetNetworkHandle();
+        SetJukebox();
+        SetUiVisibility(false);
+    }
+    private void SetNetworkHandle()
     {
         NetworkManager.Singleton.OnServerStarted += HandleServerStarted;
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
-        SetUiVisibility(false);
     }
+    private void SetJukebox()
+    {
+        objectJukebox = GameObject.FindWithTag("Jukebox").GetComponent<ObjectJukebox>();
 
+        NetworkManager.Singleton.OnServerStarted += objectJukebox.GetComponent<ObjectJukebox>().StartSong;
+        NetworkManager.Singleton.OnClientConnectedCallback += objectJukebox.GetComponent<ObjectJukebox>().StartSongClient;
+    }
     private void SetUiVisibility(bool isUserLogin)
     {
         if (isUserLogin)
@@ -41,16 +53,24 @@ public class LoginManager : MonoBehaviour
     private void OnDestroy()    //destroyed, unsubscribe the event; prevent adverse effect
     {
         if (NetworkManager.Singleton == null) { return; }
+        RemoveNetworkHandle();
+        RemoveJukebox();
+    }
+    private void RemoveNetworkHandle()
+    {
         NetworkManager.Singleton.OnServerStarted -= HandleServerStarted;
         NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect;
+    }
+    private void RemoveJukebox()
+    {
+        NetworkManager.Singleton.OnServerStarted -= objectJukebox.GetComponent<ObjectJukebox>().StartSong;
+        NetworkManager.Singleton.OnClientConnectedCallback -= objectJukebox.GetComponent<ObjectJukebox>().StartSongClient;
     }
 
     private void HandleClientConnected(ulong clientId)      //when client connected
     {
         Debug.Log("client id = " + clientId);
-        playerCliendId = Convert.ToInt32(clientId);
-        print($"client id: {clientId}    cliend id convert:  {playerCliendId}");
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {
             SetUiVisibility(true);
@@ -128,7 +148,6 @@ public class LoginManager : MonoBehaviour
         Vector3 spawnPos = Vector3.zero;
         Quaternion spawnRot = Quaternion.identity;
 
-        Debug.Log("count = " + NetworkManager.Singleton.ConnectedClients.Count);
         // if it's server player
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {

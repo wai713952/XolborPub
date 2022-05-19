@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Text;
 using TMPro;
 using Unity.Netcode;
+using UnityEngine;
 
 [RequireComponent(typeof(MiniGameControllerScore))]
 [RequireComponent(typeof(ObjectInteractable))]
@@ -14,7 +15,6 @@ public class MiniGameControllerLobby : NetworkBehaviour
 
     //public int miniGamePlayerCurrent;
 
-    public NetworkVariable<int> miniGamePlayerCurrentNetwork = new NetworkVariable<int>();
     public int miniGamePlayerMinimum;
     public int miniGamePlayerMaximum;
 
@@ -30,15 +30,29 @@ public class MiniGameControllerLobby : NetworkBehaviour
     private ObjectInteractable objectInteractable;
     private MiniGameControllerScore miniGameControllerScore;
 
+    private StringBuilder stringBuilder;
+    private string appendedIdList;
+    public string appendedIdListString;
+
     public List<bool> voteList = new List<bool>();
+
+    public NetworkVariable<int> miniGamePlayerCurrentNetwork = new NetworkVariable<int>();
     public NetworkVariable<int> voteCountNetwork = new NetworkVariable<int>();
+    public NetworkVariable<bool> isMiniGameStartedNetwork = new NetworkVariable<bool>();
+    public NetworkVariable<bool> isMiniGameOverNetwork = new NetworkVariable<bool>();
+    public NetworkVariable<NetworkString> playerIdListAppend = new NetworkVariable<NetworkString>();
     public NetworkVariable<NetworkString> miniGameStatusNetwork = new NetworkVariable<NetworkString>();
 
 
     private void Start()
     {
+        stringBuilder = new StringBuilder();
         objectInteractable = GetComponent<ObjectInteractable>();
-        miniGameControllerScore = GetComponent<MiniGameControllerScore>();
+        if (GetComponent<MiniGameControllerScore>() != null)
+        {
+            miniGameControllerScore = GetComponent<MiniGameControllerScore>();
+        }
+        InvokeRepeating("CheckMiniGamePlayerAndAppendId", 1f, 1f);
     }
 
     private void FixedUpdate()
@@ -46,12 +60,14 @@ public class MiniGameControllerLobby : NetworkBehaviour
         if (IsServer)
         {
             CheckMiniGameStatus();
-            CheckMiniGamesVote();
+            CheckMiniGameVote();
         }
     }
     private void CheckMiniGameStatus()
     {
         miniGamePlayerCurrentNetwork.Value = objectInteractable.interactorNameList.Count;
+        isMiniGameStartedNetwork.Value = isMiniGameStarted;
+        isMiniGameOverNetwork.Value = isMiniGameOver;
         miniGameStatusNetwork.Value = miniGameStatus;
 
 
@@ -77,7 +93,7 @@ public class MiniGameControllerLobby : NetworkBehaviour
             canPlayerJoinMiniGame = false;
         }
     }
-    private void CheckMiniGamesVote()
+    private void CheckMiniGameVote()
     {
         voteCountNetwork.Value = voteList.Count;
         if (voteCountNetwork.Value == 0 || isMiniGameStarted == true) { return; }
@@ -88,8 +104,40 @@ public class MiniGameControllerLobby : NetworkBehaviour
             && isLaunchingStart == false)
         {
             isLaunchingStart = true;
-            MiniGameStarted();
+            MiniGameStartedServerRpc();
         }
+    }
+    private void CheckMiniGamePlayerAndAppendId()
+    {
+        if (!IsServer) { return; }
+        if (objectInteractable.interactorIdList.Count == 0)
+        {
+            playerIdListAppend.Value = "";
+        }
+        if (objectInteractable.interactorIdList.Count == 1)
+        {
+            playerIdListAppend.Value = objectInteractable.interactorIdList[0].ToString();
+        }
+        if (objectInteractable.interactorIdList.Count > 1)
+        {
+            for (int i = 0; i < objectInteractable.interactorIdList.Count; i++)
+            {
+                stringBuilder.Append(objectInteractable.interactorIdList[i]);
+                if (i < objectInteractable.interactorIdList.Count - 1)
+                {
+                    stringBuilder.Append(',');
+                }
+            }
+            appendedIdList = stringBuilder.ToString();
+            if (appendedIdList != playerIdListAppend.Value)
+            {
+                playerIdListAppend.Value = stringBuilder.ToString();
+            }
+            appendedIdList = "";
+            stringBuilder.Clear();
+        }
+        appendedIdListString = playerIdListAppend.Value;
+        print(playerIdListAppend.Value);
     }
 
     [ServerRpc(RequireOwnership = true)]
@@ -106,52 +154,63 @@ public class MiniGameControllerLobby : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void MiniGameVoteStartServerRpc(bool vote)
     {
-        print("vote working in client");
         if (vote == true)
         {
             voteList.Add(true);
+            print("vote");
         }
         else
         {
-            if(voteList.Count == 0) { return; }
+            if (voteList.Count == 0) { return; }
+            print("remove a vote");
             voteList.Remove(true);
         }
     }
 
-    private void MiniGameStarted()
+    [ServerRpc(RequireOwnership = true)]
+    private void MiniGameStartedServerRpc()
     {
+        //the multiplayer and minigame will reference the isMiniGameStarted and will get the player in lobby to minigame
+
         print("game started");
         isMiniGameStarted = true;
     }
-
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc(RequireOwnership = false)]
     public void MiniGameOverServerRpc()
     {
         // - wait for a moment before reset the minigame
         // - make the players leave the minigame
         // - will be called in other minigame
 
-        Invoke("MiniGameReset", 3f);
         isMiniGameOver = true;
+        isLaunchingStart = false;
+        isMiniGameStarted = false;
+        Invoke("MiniGameResetServerRpc", 3f);
+
         print("game over");
     }
-    private void MiniGameReset()
+    [ServerRpc(RequireOwnership = false)]
+    private void MiniGameResetServerRpc()
     {
         // - reset the status and remove players names and votes from the list
 
-        isMiniGameStarted = false;
+        CancelInvoke("MiniGameResetServerRpc");
+
         isMiniGameOver = false;
-        isLaunchingStart = false;
         canPlayerJoinMiniGame = true;
-        
+
         objectInteractable.InteractionCDismissAll();
-        miniGameControllerScore.ResetMiniGameScoreServerRpc();
+
+        if (miniGameControllerScore != null)    //if not an arcade game, reset the scores in lobby and display winner.
+        {
+            miniGameControllerScore.ResetMiniGameScoreServerRpc();
+        }
 
         StartCoroutine(resetVote());
 
         print("minigame reset");
     }
-    IEnumerator resetVote()     
+    IEnumerator resetVote()
     {
         //the player vote cancle condition is tied to player's transform and the minigame object's transform
         //sending the minigame object to the space and bring back in milisec will do the trick
@@ -159,8 +218,10 @@ public class MiniGameControllerLobby : NetworkBehaviour
         this.transform.position = new Vector3(transform.position.x, transform.position.y + 300f, transform.position.z);
         yield return new WaitForSeconds(0.1f);
         this.transform.position = new Vector3(transform.position.x, transform.position.y - 300f, transform.position.z);
+        StopAllCoroutines();
     }
 
+    //unused
     public void StopMiniGame()
     {
         // - StopMinigame will be called in this function when the game is over by turn, or timeout,

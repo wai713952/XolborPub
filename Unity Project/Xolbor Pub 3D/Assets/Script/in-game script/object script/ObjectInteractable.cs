@@ -96,14 +96,12 @@ public class ObjectInteractable : NetworkBehaviour
                 {
                     if (pressCount == 0)    //pressing first time will join the game
                     {
-                        print("first press");
                         pressCount++;
                         AddPlayerToInteractorListServerRpc(interactorName, interactorId);
                         return; 
                     }
                     if (pressCount == 1)     //pressing second time will vote the to start
                     {
-                        print("second press");
                         pressCount++;
                         lobby.MiniGameVoteStartServerRpc(true);
                     }
@@ -149,7 +147,6 @@ public class ObjectInteractable : NetworkBehaviour
 
                     break;
                 }
-
         }
         DestroyObjectServerRpc();    //destroy the object after interaction (food, drink, garbage)
     }
@@ -205,7 +202,6 @@ public class ObjectInteractable : NetworkBehaviour
             {
                 interactorNameList.Remove(interactorNameList[i]);
                 interactorIdList.Remove(interactorIdList[i]);
-                print("get in isclient");
             }
         }
     }

@@ -61,7 +61,7 @@ public class MainPlayer : NetworkBehaviour
     }
     void SetPlayerName()
     {
-        Vector3 nameLabelPos = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0, 0.5f, 0));
+        Vector3 nameLabelPos = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0, 0.75f, 0));
         nameLabel.transform.position = nameLabelPos;
         if (!string.IsNullOrEmpty(PlayerName.Value))
         {

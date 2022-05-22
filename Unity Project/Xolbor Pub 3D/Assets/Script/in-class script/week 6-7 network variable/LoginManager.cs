@@ -11,7 +11,6 @@ public class LoginManager : MonoBehaviour
     public Text playerNameInputField;   //the text get from inputfield
     public GameObject loginPanel;
     public GameObject leaveButton;
-    public GameObject scorePanel;
 
     ObjectJukebox objectJukebox;
 
@@ -40,13 +39,11 @@ public class LoginManager : MonoBehaviour
         {
             loginPanel.SetActive(false);
             leaveButton.SetActive(true);
-            scorePanel.SetActive(true);
         }
         else
         {
             loginPanel.SetActive(true);
             leaveButton.SetActive(false);
-            scorePanel.SetActive(false);
         }
     }
 

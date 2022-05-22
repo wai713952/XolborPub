@@ -7,11 +7,9 @@ public class ObjectJukebox : NetworkBehaviour
 {
     //jukebox keeps playing the song for client in the bar zone
 
-
     public NetworkVariable<int> songIndexNetwork = new NetworkVariable<int>();
     public NetworkVariable<float> songTimeNetwork = new NetworkVariable<float>();
     public NetworkVariable<bool> isPlayingNextSong = new NetworkVariable<bool>();
-    private float songTime;
 
     public List<AudioClip> songList = new List<AudioClip>();
     AudioSource audioSource;
@@ -36,7 +34,6 @@ public class ObjectJukebox : NetworkBehaviour
     {
         if (IsServer)
         {
-            songTime = songTimeNetwork.Value;
             SongTimeCheck();
             if (audioSource.isPlaying == false && isPlayingNextSong.Value == false)
             {

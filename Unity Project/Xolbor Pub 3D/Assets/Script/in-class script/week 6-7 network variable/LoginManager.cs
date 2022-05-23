@@ -11,8 +11,38 @@ public class LoginManager : MonoBehaviour
     public Text playerNameInputField;   //the text get from inputfield
     public GameObject loginPanel;
     public GameObject leaveButton;
+    public string joinCode;
+    public Text text;
 
     ObjectJukebox objectJukebox;
+
+    public void ipAdressChanged()
+    {
+        this.joinCode = text.GetComponent<Text>().text.ToString();
+    }
+
+    public async void Client()
+    {
+        if (LoginNameCheck() == false) { return; }
+
+        if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(joinCode))
+        {
+            await RelayManager.Instance.JoinRelay(joinCode);
+            NetworkManager.Singleton.NetworkConfig.ConnectionData =
+                Encoding.ASCII.GetBytes(playerNameInputField.text);
+            NetworkManager.Singleton.StartClient();
+        }
+    }
+
+    public async void Host()
+    {
+        if (RelayManager.Instance.IsRelayEnabled)
+        {
+            await RelayManager.Instance.SetupRelay();
+        }
+        NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+        NetworkManager.Singleton.StartHost();
+    }
 
     private void Start()    //subscribe the event
     {
@@ -51,7 +81,6 @@ public class LoginManager : MonoBehaviour
     {
         if (NetworkManager.Singleton == null) { return; }
         RemoveNetworkHandle();
-        RemoveJukebox();
     }
     private void RemoveNetworkHandle()
     {
@@ -87,21 +116,6 @@ public class LoginManager : MonoBehaviour
         throw new NotImplementedException();    //keep working even the fucntion is not yet implemented
     }
 
-    public void Host()  //login as host button
-    {
-        if (LoginNameCheck() == false) { return; }
-
-        NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;   //subscript ConnectionApprovalCallback to approvealCheck
-        NetworkManager.Singleton.StartHost();                                   //start Host function
-    }
-    public void Client()    //login as client button
-    {
-        if (LoginNameCheck() == false) { return; }
-
-        NetworkManager.Singleton.NetworkConfig.ConnectionData =
-            Encoding.ASCII.GetBytes(playerNameInputField.text);     //encoding and store player's name value for later checking aprroval
-        NetworkManager.Singleton.StartClient();                     //start the client
-    }
     private bool LoginNameCheck()
     {
         bool isNameApproved = true;
@@ -119,6 +133,8 @@ public class LoginManager : MonoBehaviour
     }
     public void Leave()
     {
+        RemoveJukebox();
+
         if (NetworkManager.Singleton.IsHost)
         {
             NetworkManager.Singleton.Shutdown();
@@ -127,6 +143,7 @@ public class LoginManager : MonoBehaviour
         else if (NetworkManager.Singleton.IsClient)
         {
             NetworkManager.Singleton.Shutdown();
+
         }
         SetUiVisibility(false);
     }

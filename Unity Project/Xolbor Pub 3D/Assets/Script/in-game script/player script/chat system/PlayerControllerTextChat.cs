@@ -19,15 +19,18 @@ public class PlayerControllerTextChat : NetworkBehaviour
 
     GameObject chatBox;
     MainPlayer mainPlayer;
+    Player_Movement player_Movement;
 
     private void Start()
     {
-
         if (IsClient && IsOwner)
         {
             chatBox = GameObject.Find("chat input field");
+
             chatInputField = chatBox.GetComponent<TMP_InputField>();
             mainPlayer = GetComponent<MainPlayer>();
+            player_Movement = GetComponent<Player_Movement>();
+
             canEnterChat = true;
             chatBox.SetActive(false);
         }
@@ -60,6 +63,7 @@ public class PlayerControllerTextChat : NetworkBehaviour
                     SendChatServerRpc(chatInputField.text);
                     StartCoroutine(WaitForChat());
                     chatInputField.text = "";
+                    PlayerToggleChatField();
                 }
             }
         }
@@ -67,6 +71,7 @@ public class PlayerControllerTextChat : NetworkBehaviour
     private void PlayerToggleChatField()
     {
         mainPlayer.canControlCharacterMovement = !mainPlayer.canControlCharacterMovement;
+        player_Movement.canControlCharacterMovement = !player_Movement.canControlCharacterMovement;
 
         if (chatBox.activeSelf == false)
         {
@@ -90,6 +95,7 @@ public class PlayerControllerTextChat : NetworkBehaviour
         chatText.GetComponent<TMP_Text>().text = text;
         chatText2.GetComponent<TMP_Text>().text = text;
         whitePanelObject = Instantiate(whitePanelPrefab, whitePanelPosition.transform.position, whitePanelPosition.transform.rotation);
+        whitePanelObject.transform.parent = whitePanelPosition.transform;
     }
 
     IEnumerator WaitForChat()

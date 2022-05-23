@@ -116,7 +116,7 @@ public class ObjectInteractable : NetworkBehaviour
             }
             case "door":
             {
-                GetComponent<ObjectDoor>().Teleport(interactorTransform);
+                GetComponent<ObjectDoor>().TeleportCall(interactorTransform);
                 break;
             }
             case "food":

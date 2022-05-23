@@ -5,20 +5,23 @@ using UnityEngine.UI;
 
 public class ObjectDoor : MonoBehaviour
 {
-    private ObjectInteractable objectInteractable;
-
     public Transform teleportPosition;  //null object for teleport point
-    public Image blackPanel;            //black panel for teleport transition
+    public Transform blackPanel;            //black panel for teleport transition
+    public Transform playerTransform;
 
-    private void Start()
+    public void TeleportCall(Transform player)
     {
-        objectInteractable = GetComponent<ObjectInteractable>();
+        playerTransform = player;
+        Transform blackPanelObject = Instantiate(blackPanel);
+        blackPanelObject.SetParent(GameObject.FindWithTag("MainCanvas").transform);
+
+        Invoke("TeleportCommit", 1f);
     }
-
-    public void Teleport(Transform playerTransform)
+    private void TeleportCommit()
     {
-        Transform tempPlayerTransform = playerTransform;
-        tempPlayerTransform.position = new Vector3(teleportPosition.position.x,
-            tempPlayerTransform.position.y, teleportPosition.position.z);
+        playerTransform.position = new Vector3(teleportPosition.position.x,
+            playerTransform.position.y, teleportPosition.position.z);
+
+        CancelInvoke("TeleportCommit");
     }
 }

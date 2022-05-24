@@ -13,10 +13,7 @@ public class PlayerControllerInteraction : NetworkBehaviour
     public LayerMask interactionMask;
     public float interactionRange = 250f;
     public float interactionHeight;
-
-    public Transform miniGamePosition = null;
     
-    private MiniGameControllerLobby miniGameControllerLobby;
     private MainPlayer mainPlayer;
 
     public string playerName;
@@ -26,7 +23,6 @@ public class PlayerControllerInteraction : NetworkBehaviour
     private void Start()
     {
         Invoke("NameAndIdGet", 1f);
-        InvokeRepeating("PlayerCancleInteractionCheck", 0.5f, 1f);
     }
     private void NameAndIdGet()
     {
@@ -53,7 +49,8 @@ public class PlayerControllerInteraction : NetworkBehaviour
                 interactionMask, QueryTriggerInteraction.Collide))                              //when the ray hit on specific mask(s)
             {
                 GameObject tempInteractableObject = interactionHitObject.collider.gameObject;
-                PlayerInteract(tempInteractableObject, playerName, playerId);
+                PlayerInteract(tempInteractableObject);
+
                 Debug.DrawLine(interactionRay.origin, interactionHitObject.point, Color.red);   //show the red ray
             }
             else //when not hitting in specfied layer
@@ -64,49 +61,13 @@ public class PlayerControllerInteraction : NetworkBehaviour
         }
     }
 
-    private void PlayerInteract(GameObject interactableObject, string playerName, int playerId)
+    private void PlayerInteract(GameObject interactableObject)
     {
-        Transform playerTransform = this.transform;
         if (Input.GetKeyDown(KeyCode.E))
         {
             print("player interact");
             ObjectInteractable interact = interactableObject.GetComponent<ObjectInteractable>();
-            MiniGameControllerLobby lobby = interactableObject.GetComponent<MiniGameControllerLobby>();
-            if (lobby == null)
-            {
-                interact.InteractedByPlayer(playerName, playerId, playerTransform);
-            }
-            if (lobby != null)
-            {
-                if (interact.pressCount == 0 && lobby.miniGameStatusNetwork.Value != "Players Full")
-                {
-                    interact.InteractedByPlayer(playerName, playerId, playerTransform);
-                    miniGamePosition = interact.SendPlayerObjectPosition();
-                    miniGameControllerLobby = lobby;
-                    return;
-                }
-                if (interact.pressCount == 1 && 
-                    (lobby.miniGameStatusNetwork.Value == "Players Full" || lobby.miniGameStatusNetwork.Value == "Waiting For Player(s)"))
-                {
-                    interact.InteractedByPlayer(playerName, playerId, playerTransform);
-                    miniGamePosition = interact.SendPlayerObjectPosition();
-                    miniGameControllerLobby = lobby;
-                }
-            }
-        }
-    }
-    
-    private void PlayerCancleInteractionCheck()
-    {
-        //keep checking that player is walking too far from minigame
-        //do nothing if player not interact will anything yet
-
-        if (miniGamePosition == null) { return; }
-        if (Vector3.Distance(transform.position, miniGamePosition.position) > 3f || miniGameControllerLobby.miniGameStatus == "Game Already Started")
-        {
-            miniGamePosition.GetComponent<ObjectInteractable>().RemovePlayerNameAndVoteFromList(playerName);
-            miniGamePosition.GetComponent<ObjectInteractable>().pressCount = 0;
-            miniGamePosition = null;
+            interact.InteractedByPlayer(transform);
         }
     }
 }

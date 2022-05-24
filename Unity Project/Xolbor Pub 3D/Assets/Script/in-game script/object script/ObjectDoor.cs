@@ -14,14 +14,13 @@ public class ObjectDoor : MonoBehaviour
         playerTransform = player;
         Transform blackPanelObject = Instantiate(blackPanel);
         blackPanelObject.SetParent(GameObject.FindWithTag("MainCanvas").transform);
-
         Invoke("TeleportCommit", 1f);
     }
     private void TeleportCommit()
     {
         playerTransform.position = new Vector3(teleportPosition.position.x,
             playerTransform.position.y, teleportPosition.position.z);
-
+        playerTransform.GetComponent<Player_Movement>().PlayerPreventActionCall(2f);
         CancelInvoke("TeleportCommit");
     }
 }

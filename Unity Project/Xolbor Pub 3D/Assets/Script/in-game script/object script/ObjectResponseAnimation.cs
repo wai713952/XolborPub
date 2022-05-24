@@ -31,8 +31,6 @@ public class ObjectResponseAnimation : NetworkBehaviour
 
     public void ResetInteractionAfterAnimation()
     {
-        //this method will be called in animation frame
-
         animator.SetBool("play animation", false);
         Invoke("ResetWaiting", timeWaitForNextInteraction);
     }

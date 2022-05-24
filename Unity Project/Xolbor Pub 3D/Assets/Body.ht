@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1105 &110500000
+HumanTemplate:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Body
+  m_BoneTemplate:
+    Chest: B-chest
+    Head: B-head
+    Hips: B-hips
+    Jaw: B-jaw
+    Left Index Distal: B-f_index_03_L
+    Left Index Intermediate: B-f_index_02_L
+    Left Index Proximal: B-f_index_01_L
+    Left Little Distal: B-f_pinky_03_L
+    Left Little Intermediate: B-f_pinky_02_L
+    Left Little Proximal: B-f_pinky_01_L
+    Left Middle Distal: B-f_middle_03_L
+    Left Middle Intermediate: B-f_middle_02_L
+    Left Middle Proximal: B-f_middle_01_L
+    Left Ring Distal: B-f_ring_03_L
+    Left Ring Intermediate: B-f_ring_02_L
+    Left Ring Proximal: B-f_ring_01_L
+    Left Thumb Distal: B-thumb_03_L
+    Left Thumb Intermediate: B-thumb_02_L
+    Left Thumb Proximal: B-thumb_01_L
+    LeftFoot: B-foot_L
+    LeftHand: B-hand_L
+    LeftLowerArm: B-forearm_L
+    LeftLowerLeg: B-shin_L
+    LeftShoulder: B-shoulder_L
+    LeftToes: B-toe_L
+    LeftUpperArm: B-upper_arm_L
+    LeftUpperLeg: B-thigh_L
+    Neck: B-neck
+    Right Index Distal: B-f_index_03_R
+    Right Index Intermediate: B-f_index_02_R
+    Right Index Proximal: B-f_index_01_R
+    Right Little Distal: B-f_pinky_03_R
+    Right Little Intermediate: B-f_pinky_02_R
+    Right Little Proximal: B-f_pinky_01_R
+    Right Middle Distal: B-f_middle_03_R
+    Right Middle Intermediate: B-f_middle_02_R
+    Right Middle Proximal: B-f_middle_01_R
+    Right Ring Distal: B-f_ring_03_R
+    Right Ring Intermediate: B-f_ring_02_R
+    Right Ring Proximal: B-f_ring_01_R
+    Right Thumb Distal: B-thumb_03_R
+    Right Thumb Intermediate: B-thumb_02_R
+    Right Thumb Proximal: B-thumb_01_R
+    RightFoot: B-foot_R
+    RightHand: B-hand_R
+    RightLowerArm: B-forearm_R
+    RightLowerLeg: B-shin_R
+    RightShoulder: B-shoulder_R
+    RightToes: B-toe_R
+    RightUpperArm: B-upper_arm_R
+    RightUpperLeg: B-thigh_R
+    Spine: B-spine
+    UpperChest: B-upperChest

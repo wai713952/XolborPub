@@ -7,11 +7,12 @@ using TMPro;
 public class PlayerControllerTextChat : NetworkBehaviour
 {
     public GameObject chatText;
-    public GameObject chatText2;
+    //public GameObject chatText2;
     private TMP_InputField chatInputField;
 
     public GameObject whitePanelPrefab;
     public Transform whitePanelPosition;
+
     public GameObject whitePanelObject;
 
     public NetworkVariable<NetworkString> textNetwork = new NetworkVariable<NetworkString>();
@@ -39,12 +40,6 @@ public class PlayerControllerTextChat : NetworkBehaviour
     {
         if (IsClient && IsOwner)
         {
-            if (whitePanelObject != null)
-            {
-                whitePanelObject.transform.position = whitePanelPosition.transform.position;
-                whitePanelObject.transform.rotation = whitePanelPosition.transform.rotation;
-            }
-
             if (Input.GetKeyDown(KeyCode.F1))
             {
                 PlayerToggleChatField();
@@ -76,6 +71,7 @@ public class PlayerControllerTextChat : NetworkBehaviour
         if (chatBox.activeSelf == false)
         {
             chatBox.SetActive(true);
+            chatBox.GetComponent<Animation>().Play();
             chatInputField.text = "";
         }
         else
@@ -92,10 +88,9 @@ public class PlayerControllerTextChat : NetworkBehaviour
     [ClientRpc]
     private void SendChatClientRpc(string text)
     {
+        whitePanelObject.SetActive(true);
+
         chatText.GetComponent<TMP_Text>().text = text;
-        chatText2.GetComponent<TMP_Text>().text = text;
-        whitePanelObject = Instantiate(whitePanelPrefab, whitePanelPosition.transform.position, whitePanelPosition.transform.rotation);
-        whitePanelObject.transform.parent = whitePanelPosition.transform;
     }
 
     IEnumerator WaitForChat()
@@ -114,7 +109,6 @@ public class PlayerControllerTextChat : NetworkBehaviour
     private void ClearChatClientRpc()
     {
         chatText.GetComponent<TMP_Text>().text = "";
-        chatText2.GetComponent<TMP_Text>().text = "";
-        Destroy(whitePanelObject);
+        whitePanelObject.SetActive(false);
     }
 }

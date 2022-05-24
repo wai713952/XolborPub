@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class TextController : MonoBehaviour
 {
-    void Start()
+    GameObject mainCamera;
+
+    private void Start()
     {
-        
+        mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
     }
 
-    void Update()
+    private void Update()
     {
-        
+        if (mainCamera)
+        {
+            transform.LookAt(2 * transform.position - mainCamera.transform.position);
+        }
     }
 }

@@ -20,7 +20,7 @@ public class CharacterTypeSetup : NetworkBehaviour
             characterTypeChooseMenu = GameObject.FindWithTag("TypeController").GetComponent<CharacterTypeChooseMenu>();
             SetCustomizationToNetworkServerRpc(characterTypeChooseMenu.headTypeIndex, characterTypeChooseMenu.bodyTypeIndex);
         }
-        Invoke("ApplyCustomizationToCharacter", 0.35f);
+        Invoke("ApplyCustomizationToCharacter", 3f);
     }
 
     [ServerRpc]
@@ -32,7 +32,7 @@ public class CharacterTypeSetup : NetworkBehaviour
     
     public void ApplyCustomizationToCharacter()
     {
-        for (int i = 0; i < headObjectList.Count; i++)
+        for (int i = 0; i < headObjectList.Count + 1; i++)
         {
             if (headTypeIndexNetwork.Value == 0)
             {
@@ -40,7 +40,7 @@ public class CharacterTypeSetup : NetworkBehaviour
             }
             if (i == headTypeIndexNetwork.Value)
             {
-                headObjectList[i - 1].SetActive(true);
+                headObjectList[i-1].SetActive(true);
                 break;
             }
         }

@@ -107,24 +107,28 @@ public class Player_Movement_New : NetworkBehaviour
 		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.W))	//run
         {
 			animatiomName = "run";
+			animator.SetFloat("move", 1f);
 			movementSpeedCurrent = movementSpeedMax;
 			animator.speed = 1;
 		}
 		else if (!Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.W))	//walk
 		{
 			animatiomName = "walk";
+			animator.SetFloat("move", 0.18f);
 			movementSpeedCurrent = movementSpeedMin;
 			animator.speed = 1;
 		}
 		else if (!Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.S))	//step back
 		{
 			animatiomName = "step back";
+			animator.SetFloat("move", 0.145f);
 			movementSpeedCurrent = movementSpeedMin / 1.5f;
 			animator.speed = 1;
 		}
 		else if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))	//idle
         {
 			animatiomName = "idle";
+			animator.SetFloat("move", 0f);
 			movementSpeedCurrent = 0;
 			animator.speed = 1;
 		}
@@ -142,7 +146,7 @@ public class Player_Movement_New : NetworkBehaviour
 		if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) && !(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)))
         {
 			animatiomName = "turning";
-			animator.SetFloat("move", 0.15f);
+			animator.SetFloat("move", 0.12f);
 		}
 	}
 	private void PlayerFirstPersonView()
